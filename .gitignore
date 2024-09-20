@@ -6,7 +6,6 @@ __pycache__/
 # C extensions
 *.so
 
-data_prep/
 
 # Distribution / packaging
 .Python
@@ -163,6 +162,6 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 .idea/
 /static_collection
-some_NQ.text
-data_preparation.ipynb
-logs.csv
+
+# ignore data_prep folder
+data_prep/
