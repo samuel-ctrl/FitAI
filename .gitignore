@@ -164,4 +164,6 @@ cython_debug/
 /static_collection
 
 # ignore data_prep folder
-data_prep/
+data_prep/*
+data_prep/chick-fil-a.json
+data_prep/chick-fil-a.csv
