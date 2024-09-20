@@ -1,8 +1,0 @@
-version: "3.8"
-services:
-  workspace:
-    image: vscode:focal  # Official VS Code image for Ubuntu 20.04
-    volumes:
-      - ./:/workspace  # Mount your local project directory
-      - /var/run/docker.sock:/var/run/docker.sock  # Access host's Docker socket
-    command: ["code", "--wait"]  # Start VS Code in the container

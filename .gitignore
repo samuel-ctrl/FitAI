@@ -167,3 +167,4 @@ cython_debug/
 data_prep/*
 data_prep/chick-fil-a.json
 data_prep/chick-fil-a.csv
+logs.csv

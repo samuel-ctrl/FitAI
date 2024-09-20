@@ -67,6 +67,7 @@ PROMPT_CHAT_TEMPLATE_NO_MENU_AND_INFO = """You are FitAI, a helpful nutritionist
 - Avoid unnecessary or redundant phrases.
 - Provide concise, informative messages in markdown format.
 - Ensure suggested questions are concise, unique and not repetitive.
+- your tone should be friendly and informative.
 - Ensure to send only response in JSON format.
 """
 
@@ -92,8 +93,9 @@ PROMPT_CHAT_TEMPLATE_WITH_MENU = """You are FitAI, a dietitian and nutritionist 
    - `suggestions`: A list of suggestion questions.
 
 ### Guidelines:
-- Avoid duplicate menu items.
+- Ensure to provide multiple menus.
 - Avoid unnecessary or redundant phrases in the response.
+- your tone should be friendly and informative.
 - Ensure the response is strictly in JSON format as specified.
 """
 
@@ -220,6 +222,6 @@ class PresencePenalty(Enum):
 
 
 class MaxTokens(Enum):
-    LOW_MAX_TOKENS = 300
-    MEDIUM_MAX_TOKENS = 600
-    HIGH_MAX_TOKENS = 1000
+    LOW_MAX_TOKENS = 450
+    MEDIUM_MAX_TOKENS = 900
+    HIGH_MAX_TOKENS = 1500

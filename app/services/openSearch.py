@@ -118,7 +118,7 @@ async def _get_llm_response(
             return message.parsed
 
     except Exception as e:
-        if e is openai.LengthFinishReasonError:
+        if isinstance(e, openai.LengthFinishReasonError):
             raise {
                 "error": "TOO_MANY_TOKENS",
                 "detail": "Too many tokens",
