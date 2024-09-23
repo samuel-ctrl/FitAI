@@ -39,7 +39,7 @@ def get_chat_format(chat_history: dict, system_prompt) -> ChatCompletionMessageP
             "role": "system",
             "content": system_prompt,
         },
-        *chat_history.get("histrory", []),
+        *chat_history.get("history", []),
         {"role": "user", "content": chat_history.get("text")},
     ]
 
