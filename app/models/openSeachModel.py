@@ -162,8 +162,8 @@ class DishInfo(BaseModel):
 
 
 class OnlyMenuResponse(BaseModel):
-    menus: List[DishInfo]
-    message_res: str
+    menus: Optional[List[DishInfo]] = None
+    message_res: Optional[str] = None
     suggestions: Optional[List[str]] = None
 
 

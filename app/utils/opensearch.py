@@ -33,8 +33,37 @@ def format_food_item(menu_dict) -> str:
     )
 
 
+def get_menu_dict(menu_item: str) -> dict:
+    """
+    Extracts the menu item information from the given string.
+    """
+    # Define the regex pattern to match the menu item information
+    pattern = r"([A-Za-z\s]+) for ([A-Za-z\s]+) is ([A-Za-z\s]+) with ([0-9]+) calories. It contains ([0-9]+)g of fat, ([0-9]+)g of saturated fat, ([0-9]+)mg of cholesterol, ([0-9]+)mg of sodium, ([0-9]+)g of carbs, ([0-9]+)g of sugar, ([0-9]+)g of fiber, and ([0-9]+)g of protein."
+    # Use re.search to find the first match in the string
+    match = re.search(pattern, menu_item)
+    # If a match is found, extract the information
+    if match:
+        return {
+            "provider": match.group(1),
+            "name": match.group(2),
+            "category": match.group(3),
+            "serving_size": match.group(4),
+            "calories": match.group(5),
+            "fat_g": match.group(6),
+            "sat_fat_g": match.group(7),
+            "cholesterol_mg": match.group(8),
+            "sodium_mg": match.group(9),
+            "carbohydrates_g": match.group(10),
+            "sugar_g": match.group(11),
+            "fiber_g": match.group(12),
+            "protein_g": match.group(13),
+        }
+    else:
+        return {}
+
+
 def get_chat_format(chat_history: dict, system_prompt) -> ChatCompletionMessageParam:
-    return [
+    chat = [
         {
             "role": "system",
             "content": system_prompt,
@@ -42,6 +71,7 @@ def get_chat_format(chat_history: dict, system_prompt) -> ChatCompletionMessageP
         *chat_history.get("history", []),
         {"role": "user", "content": chat_history.get("text")},
     ]
+    return chat
 
 
 def get_completion_format(chat_history: dict, system_prompt: str) -> str:

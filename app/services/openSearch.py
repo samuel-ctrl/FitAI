@@ -45,6 +45,7 @@ from app.utils.opensearch import (
     format_food_item,
     get_combined_chunks,
     get_chat_format,
+    get_menu_dict,
 )
 from openai.types.chat import ChatCompletionMessageParam
 
@@ -316,73 +317,78 @@ class OpenSearchService:
 
             dataset = await self.vdb_handler.async_client.msearch(body=search_query)
             available_menus, available_infos = get_combined_chunks(dataset)
-        (
-            system_prompt,
-            response_format,
-            temperature,
-            max_tokens,
-            top_p,
-            frequency_penalty,
-            presence_penalty,
-        ) = (
+        if request.prompt:
             (
-                PROMPT_CHAT_TEMPLATE_WITH_MENU_AND_INFO,
-                BothFAQAndMenuResponse,
-                Temperature.LOW_TEMPERATURE.value,
-                MaxTokens.HIGH_MAX_TOKENS.value,
-                NucleusSampling.LOW_NUCLEUS_SAMPLING.value,
-                FrequencyPenalty.HIGH_FREQUENCY_PENALTY.value,
-                PresencePenalty.HIGH_PRESENCE_PENALTY.value,
-            )
-            if available_menus and available_infos
-            else (
+                system_prompt,
+                response_format,
+                temperature,
+                max_tokens,
+                top_p,
+                frequency_penalty,
+                presence_penalty,
+            ) = (
                 (
-                    PROMPT_CHAT_TEMPLATE_WITH_MENU,
-                    OnlyMenuResponse,
+                    PROMPT_CHAT_TEMPLATE_WITH_MENU_AND_INFO,
+                    BothFAQAndMenuResponse,
                     Temperature.LOW_TEMPERATURE.value,
                     MaxTokens.HIGH_MAX_TOKENS.value,
                     NucleusSampling.LOW_NUCLEUS_SAMPLING.value,
                     FrequencyPenalty.HIGH_FREQUENCY_PENALTY.value,
                     PresencePenalty.HIGH_PRESENCE_PENALTY.value,
                 )
-                if available_menus
+                if available_menus and available_infos
                 else (
                     (
-                        PROMPT_CHAT_TEMPLATE_WITH_INFO,
-                        OnlyFAQResponse,
-                        Temperature.MEDIUM_TEMPERATURE.value,
-                        MaxTokens.LOW_MAX_TOKENS.value,
+                        PROMPT_CHAT_TEMPLATE_WITH_MENU,
+                        OnlyMenuResponse,
+                        Temperature.LOW_TEMPERATURE.value,
+                        MaxTokens.HIGH_MAX_TOKENS.value,
                         NucleusSampling.LOW_NUCLEUS_SAMPLING.value,
                         FrequencyPenalty.HIGH_FREQUENCY_PENALTY.value,
-                        PresencePenalty.MID_PRESENCE_PENALTY.value,
+                        PresencePenalty.HIGH_PRESENCE_PENALTY.value,
                     )
-                    if available_infos
+                    if available_menus
                     else (
-                        PROMPT_CHAT_TEMPLATE_NO_MENU_AND_INFO,
-                        NoResponse,
-                        Temperature.HIGH_TEMPERATURE.value,
-                        MaxTokens.LOW_MAX_TOKENS.value,
-                        NucleusSampling.LOW_NUCLEUS_SAMPLING.value,
-                        FrequencyPenalty.HIGH_FREQUENCY_PENALTY.value,
-                        PresencePenalty.LOW_PRESENCE_PENALTY.value,
+                        (
+                            PROMPT_CHAT_TEMPLATE_WITH_INFO,
+                            OnlyFAQResponse,
+                            Temperature.MEDIUM_TEMPERATURE.value,
+                            MaxTokens.LOW_MAX_TOKENS.value,
+                            NucleusSampling.LOW_NUCLEUS_SAMPLING.value,
+                            FrequencyPenalty.HIGH_FREQUENCY_PENALTY.value,
+                            PresencePenalty.MID_PRESENCE_PENALTY.value,
+                        )
+                        if available_infos
+                        else (
+                            PROMPT_CHAT_TEMPLATE_NO_MENU_AND_INFO,
+                            NoResponse,
+                            Temperature.HIGH_TEMPERATURE.value,
+                            MaxTokens.LOW_MAX_TOKENS.value,
+                            NucleusSampling.LOW_NUCLEUS_SAMPLING.value,
+                            FrequencyPenalty.HIGH_FREQUENCY_PENALTY.value,
+                            PresencePenalty.LOW_PRESENCE_PENALTY.value,
+                        )
                     )
                 )
             )
-        )
-        chat = get_chat_format(
-            chat_history=user_chat,
-            system_prompt=system_prompt.format(
-                AVAILABLE_MENUS="\n-".join(available_menus),
-                AVAILABLE_INFOS="\n-".join(available_infos),
-            ),
-        )
-        final_llm_res = await _get_llm_response(
-            chat,
-            response_format,
-            temperature,
-            max_tokens,
-            top_p,
-            frequency_penalty,
-            presence_penalty,
-        )
+            chat = get_chat_format(
+                chat_history=user_chat,
+                system_prompt=system_prompt.format(
+                    AVAILABLE_MENUS="\n-".join(available_menus),
+                    AVAILABLE_INFOS="\n-".join(available_infos),
+                ),
+            )
+            final_llm_res = await _get_llm_response(
+                chat,
+                response_format,
+                temperature,
+                max_tokens,
+                top_p,
+                frequency_penalty,
+                presence_penalty,
+            )
+        else:
+            final_llm_res = OnlyMenuResponse(
+                menus=[menu for menu in get_menu_dict(available_menus)]
+            )
         return final_llm_res

@@ -10,6 +10,7 @@ from langchain_community.vectorstores import OpenSearchVectorSearch
 from app.models.settings import Settings
 from app.logger import initialize_csv
 from app.constants import embedding_model_dimension, IndexesEnum
+from fastapi.middleware.cors import CORSMiddleware
 
 # logger initialization for dev
 initialize_csv()
@@ -73,6 +74,15 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # You can specify the domains you want to allow
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods (GET, POST, etc.)
+    allow_headers=["*"],  # Allows all headers
+)
 
 from app.endpoints import OpensearchApi  # noqa: E402
 
