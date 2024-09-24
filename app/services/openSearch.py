@@ -219,6 +219,7 @@ def _extraction_for_custom_prompt(request: SearchRequest) -> MetadataExtraction:
     return MetadataExtraction(indexes=indexes)
 
 
+
 class OpenSearchService:
     def __init__(self, openseach_client: OpenSearchVectorSearch):
         self.vdb_handler = openseach_client
